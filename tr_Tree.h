@@ -1,4 +1,4 @@
-  float mjj_JESDown,mjj_JESUp,jdeta_JESDown,jdeta_JESUp,metphi_JESDown,metphi_JESUp,met_JESDown,met_JESUp,metphi_UESDown,metphi_UESUp,met_UESDown,met_UESUp,amcatNLO_weight,genM,genpT,pt_top1,pt_top2,filterIsoMu24,filterIsoTkMu24,numGenJets,filterIsoMu22,filterIsoTkMu22,genDR_2,metcov00,metcov01,metcov11;
+  float mjj_JESDown,mjj_JESUp,jdeta_JESDown,jdeta_JESUp,metphi_JESDown,metphi_JESUp,met_JESDown,met_JESUp,metphi_UESDown,metphi_UESUp,met_UESDown,met_UESUp,amcatNLO_weight,genM,genpT,pt_top1,pt_top2,filterIsoMu24,filterIsoTkMu24,numGenJets,filterIsoMu22,filterIsoTkMu22,genDR_2,metcov00,metcov01,metcov11, genEta, genPhi;
   float bpt_1_JESUp, bpt_1_JESDown, beta_1_JESUp, beta_1_JESDown, bphi_1_JESUp, bphi_1_JESDown, bflavor_1_JESUp, bflavor_1_JESDown;
   int nbtag_JESUp, nbtag_JESDown;
   float m_sv_JESUp, m_sv_JESDown, m_sv_UESUp, m_sv_UESDown, pt_sv_JESUp, pt_sv_JESDown, pt_sv_UESUp, pt_sv_UESDown;

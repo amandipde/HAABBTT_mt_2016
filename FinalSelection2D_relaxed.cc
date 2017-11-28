@@ -25,6 +25,7 @@
 #include "myHelper.h"
 #include "tr_Tree.h"
 #include "ScaleFactor.h"
+#include "ZmmSF.h"
 #include "LumiReweightingStandAlone.h"
 #include "btagSF.h"
 #include "RooWorkspace.h"
@@ -60,6 +61,9 @@ int main(int argc, char** argv) {
     //TFile *fZ=new TFile("zpt_weights_2016_BtoH.root");
     TFile *fZ=new TFile("zpt_weights_btag.root");
     TH2F *histZ=(TH2F*) fZ->Get("zptmass_histo");
+
+    TFile *fM=new TFile("mbtt_weights_2016_BtoH.root");
+    TH1F *histM=(TH1F*) fM->Get("mbtt_histo");
 
     //TFile fw("htt_scalefactors_v16_3.root");
     //RooWorkspace *w = (RooWorkspace*)fw.Get("w");
@@ -106,6 +110,8 @@ int main(int argc, char** argv) {
     else if (sample=="VBFbbtt20") {xs=0.01*3.782*0.1983; weight=luminosity*xs/ngen;}
     else if (sample=="VBFbbtt40") {xs=0.01*3.782*0.1908; weight=luminosity*xs/ngen;}
     else if (sample=="VBFbbtt60") {xs=0.01*3.782*0.1799; weight=luminosity*xs/ngen;}
+    else if (sample=="WHbbtt40") {xs=0.01*(0.5328+0.840)*0.339; weight=luminosity*xs/ngen;}
+    else if (sample=="ZHbbtt40") {xs=0.01*0.8839*0.242; weight=luminosity*xs/ngen;}
     else if (sample=="ggH125") {xs=48.58*0.0627; weight=luminosity*xs/ngen;}
     else if (sample=="VBF125") {xs=3.782*0.0627; weight=luminosity*xs/ngen;}
     else if (sample=="ggH120") {xs=52.22*0.0698; weight=luminosity*xs/ngen;}
@@ -136,6 +142,9 @@ int main(int argc, char** argv) {
     else if (sample=="ZH130") {xs=0.7899*0.0541; weight=luminosity*xs/ngen;}
     else if (sample=="ZH110") {xs=1.309*0.0791; weight=luminosity*xs/ngen;}
     else if (sample=="ZH140") {xs=0.6514*0.0360; weight=luminosity*xs/ngen;}
+    else if (sample=="ZH_LLBB") {xs=0.8839*0.10974*0.5824; weight=luminosity*xs/ngen;}
+    else if (sample=="WminusH_LBB") {xs=0.5328*3*0.108535*0.5824; weight=luminosity*xs/ngen;}
+    else if (sample=="WplusH_LBB") {xs=0.840*3*0.108535*0.5824; weight=luminosity*xs/ngen;}
     else if (sample=="ttHnonbb") {xs=0.5085*(1-0.577); weight=luminosity*xs/ngen;}//FIXME
     else if (sample=="WGLNu") {xs=489.0; weight=luminosity*xs/ngen;}
     else if (sample=="WGstarMuMu") {xs=2.793; weight=luminosity*xs/ngen;}
@@ -261,6 +270,8 @@ int main(int argc, char** argv) {
     arbre->SetBranchAddress("npu",&npu);
     arbre->SetBranchAddress("genpT",&genpT);
     arbre->SetBranchAddress("genM",&genM);
+    arbre->SetBranchAddress("genEta",&genEta);
+    arbre->SetBranchAddress("genPhi",&genPhi);
     arbre->SetBranchAddress("pt_top1",&pt_top1);
     arbre->SetBranchAddress("pt_top2",&pt_top2);
     arbre->SetBranchAddress("genDR_2",&genDR_2);
@@ -275,35 +286,17 @@ int main(int argc, char** argv) {
     arbre->SetBranchAddress("bflavorL_2",&bflavorL_2);
 
 
-    //float bins0[] = {-150,-130,-110,-90,-70,-50,-30,-10,10,30,50};
-    //float bins1[] = {-150,-130,-110,-90,-70,-50,-30,-10,10,30,50};
-   //float bins0[] = {0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300};//,320,340,360,380,400,420,440,460,480,500};
-   //float bins1[] = {0,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300};//,320,340,360,380,400,420,440,460,480,500};
-   //float bins0[] = {20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130};
    float bins0[] = {0,20,40,60,80,100,120,140,160,180,200}; //gt120
-   float bins1[] = {10,15,20,25,30,35,40,45,50,55,60,65,70,75,80};//100-120
-   float bins2[] = {10,15,20,25,30,35,40,45,50,55,60,65,70};//80-100
-   float bins3[] = {10,15,20,25,30,35,40,45,50,55};//lt80
-   //float bins3[] = {0,0.4,0.8,1.2,1.6,2.0,2.4,2.8,3.2,3.6,4.0,4.4,4.8};
-   //float bins3[] = {0,0.4,0.8,1.2,1.6,2.0,2.4};
+   float bins1[] = {10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,115};//100-120
+   float bins2[] = {10,15,20,25,30,35,40,45,50,55,60,65,70,95};//80-100
+   float bins3[] = {10,15,20,25,30,35,40,45,50,55,75};//lt80
 
-   //float bins2[] = {9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75};
-   /*float bins0[] = {-120,-110,-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70};
-   float bins1[] = {-120,-110,-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70};
-   float bins2[] = {-120,-110,-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70};
-   float bins3[] = {-120,-110,-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70};*/
-   //float bins2[] = {-170,-150,-130,-110,-90,-70,-50,-30,-10,10,30,50,70};
-   //float bins2[] = {0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0};
-   /*float bins0[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160};
-   float bins1[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160};
-   float bins2[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160};
-   float bins3[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160};*/
-   //float bins0[] = {0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2};
-   //float bins1[] = {0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2};
-   //float bins0[] = {0,1,2,3,4,5,6,7};
-   //float bins1[] = {0,1,2,3,4,5,6,7};
-   //float bins0[] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
-   //float bins1[] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
+
+/*   float bins0[] = {0,60,120,180}; //gt120
+   float bins1[] = {10,15,20,25,30,35,40,45,50,55,60,115};//100-120
+   float bins2[] = {10,15,20,25,30,35,40,45,50,55,60,95};//80-100
+   float bins3[] = {10,15,20,25,30,35,40,45,50,55,60,75};//lt80
+*/
 
    int  binnum1 = sizeof(bins1)/sizeof(Float_t) - 1;
    int  binnum0 = sizeof(bins0)/sizeof(Float_t) - 1;
@@ -735,6 +728,22 @@ int main(int argc, char** argv) {
 	    float var_1b=mtt;
             float var_2b=mtt;
 
+        if (sample=="ZTT" or sample=="ZLL" or sample=="ZL" or sample=="ZJ" or sample=="DYlow" or sample=="DY1low" or sample=="DY2low"){
+	     TLorentzVector genZ;
+	     genZ.SetPtEtaPhiM(genpT,genEta,genPhi,genM);
+	     float genmbtt=(genZ+mybjet1).M();
+	     if (genmbtt<40) genmbtt=40;
+	     if (genmbtt>600) genmbtt=600;
+	     float mbtt_corr=histM->GetBinContent(histM->GetXaxis()->FindBin(genmbtt));
+	     if (mbtt_corr<0.5) mbtt_corr=1.0;
+	     if (fabs(tes)!=8) weight2=weight2*mbtt_corr;
+             if (tes==8) // up
+                 weight2=weight2*(1+2.00*(mbtt_corr-1));
+             if (tes==-8) // down
+                 weight2=weight2*(1+0.00*(mbtt_corr-1));
+
+	}
+
             if (sample!="data_obs"){
 	       if (mymu.Pt()<23){ 
                    w2->var("t_pt")->setVal(mytau.Pt());
@@ -775,7 +784,7 @@ int main(int argc, char** argv) {
                else if (l2_decayMode==10) fr=p0_dm10_E-p1_dm10_E*pt_2;
             }*/
 	    //Tight
-	    if (l2_decayMode==0) fr= 0.2401 - 0.000614282 * (mytau.Pt()-40);
+	    /*if (l2_decayMode==0) fr= 0.2401 - 0.000614282 * (mytau.Pt()-40);
             if (l2_decayMode==1) fr= 0.230823 - 0.000918427 * (mytau.Pt()-40);
             if (l2_decayMode==10) fr= 0.17867 + 0.000316496 * (mytau.Pt()-40);
 
@@ -796,8 +805,11 @@ int main(int argc, char** argv) {
                 if (k==9) fr= 0.234195 -0.00054236 * (mytau.Pt()-40);
                 if (k==10) fr= 0.240103 -0.00024351 * (mytau.Pt()-40);
                 if (k==11) fr= 0.240112 -0.000985054 * (mytau.Pt()-40);
-            }
+            }*/
 
+	    if (l2_decayMode==0) fr= 2.20179e-01 + 3.17084e-01*(TMath::Landau(mytau.Pt(),2.30233e+01,2.62218e+00,0));
+            if (l2_decayMode==1) fr= 1.83924e-01 + 8.66271e+00*(TMath::Landau(mytau.Pt(),-2.56076e+01,4.12774e+00,0));
+            if (l2_decayMode==10) fr= 6.27144e-02 + 7.25830e-01*(TMath::Landau(mytau.Pt(),6.37171e+01,3.38631e+01,0));
 
 	    /*//Medium
 	    if (l2_decayMode==0) fr= 0.3696 - 0.0009 * (pt_2-40);
@@ -809,7 +821,7 @@ int main(int argc, char** argv) {
             if (l2_decayMode==1) fr= 0.1433 - 0.0007 * (pt_2-40);
             if (l2_decayMode==10) fr= 0.1124 + 0.0003 * (pt_2-40);*/
 
-bool selection_1b = (mt1<40 and mt2<50);//FIXME
+bool selection_1b =(mt1<50 and mt2<60); // (mt1<40 and mt2<50);//FIXME
 //selection_1b=true;
 //selection_1b=mt1<50 and mt2<60;//true;
 
@@ -870,7 +882,7 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
                     h1_QCD[k]->Fill(var_2b,weight2*aweight*weight_btag_2b);
             }
 
-            if (is_1b_gt120){
+            if (is_1b_gt120 && mt1<40){
                 if (signalRegion && q_1*q_2<0){
                     h2_OS[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
                 }
@@ -887,7 +899,7 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
                     h2_QCD[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
             }
 
-            if (is_1b){
+            if (is_1b && mt1<40){
                 if (signalRegion && q_1*q_2<0){
                     h3_OS[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
                 }
@@ -904,7 +916,7 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
                     h3_QCD[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
             }
 
-            if (is_1b_lt80 and mt1<40 and mt2<50){
+            if (is_1b_lt80 and mt1<40){
                 if (signalRegion && q_1*q_2<0){
                     h4_OS[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
 //cout<<var_1b<<" "<<nbtagT<<" "<<byVTightIsolationMVArun2v1DBoldDMwLT_2<<endl;
@@ -922,7 +934,7 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
                     h4_QCD[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
             }
 
-            if (is_1b_80to100 && pzeta<0 && mt2<40){
+            if (is_1b_80to100 && pzeta<0 && mt1<50){
                 if (signalRegion && q_1*q_2<0){
                     h5_OS[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
                 }
@@ -939,7 +951,7 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
                     h5_QCD[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
             }
 
-            if (is_1b_100to120 && pzeta<0 && mt2<40){
+            if (is_1b_100to120){
                 if (signalRegion && q_1*q_2<0){
                     h6_OS[k]->Fill(var_1b,weight2*aweight*weight_btag_1b);
                 }
@@ -1017,6 +1029,10 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
         postfix="_CMS_htt_dyShape_13TeVUp";
     if (tes==-10)
         postfix="_CMS_htt_dyShape_13TeVDown";
+    if (tes==8)
+        postfix="_CMS_mbttShape_13TeVUp";
+    if (tes==-8)
+        postfix="_CMS_mbttShape_13TeVDown";
     if (tes==-14)
         postfix="_CMS_htt_jetToTauFake_13TeVDown";
     if (tes==14)
@@ -1081,51 +1097,60 @@ bool is_1b_gt120=mbtt>=115 and has_1b and selection_1b;
        if (tes==30) postfix=postfixFake[k];
 
        for (int nn=1; nn<h0_OS[k]->GetSize()-1; ++nn){
-           if (h0_OS[k]->GetBinContent(nn)<=0) h0_OS[k]->SetBinContent(nn,0.00001);
-           if (h0_SS[k]->GetBinContent(nn)<=0) h0_SS[k]->SetBinContent(nn,0.00001);
-           if (h0_QCD[k]->GetBinContent(nn)<=0) h0_QCD[k]->SetBinContent(nn,0.00001);
-           if (h0_WOS[k]->GetBinContent(nn)<=0) h0_WOS[k]->SetBinContent(nn,0.00001);
-           if (h0_WSS[k]->GetBinContent(nn)<=0) h0_WSS[k]->SetBinContent(nn,0.00001);
-           if (h1_OS[k]->GetBinContent(nn)<=0) h1_OS[k]->SetBinContent(nn,0.00001);
-           if (h1_SS[k]->GetBinContent(nn)<=0) h1_SS[k]->SetBinContent(nn,0.00001);
-           if (h1_QCD[k]->GetBinContent(nn)<=0) h1_QCD[k]->SetBinContent(nn,0.00001);
-           if (h1_WOS[k]->GetBinContent(nn)<=0) h1_WOS[k]->SetBinContent(nn,0.00001);
-           if (h1_WSS[k]->GetBinContent(nn)<=0) h1_WSS[k]->SetBinContent(nn,0.00001);
-
-           if (h0_AI[k]->GetBinContent(nn)<=0) h0_AI[k]->SetBinContent(nn,0.00001);
-           if (h1_AI[k]->GetBinContent(nn)<=0) h1_AI[k]->SetBinContent(nn,0.00001);
-           if (h2_AI[k]->GetBinContent(nn)<=0) h2_AI[k]->SetBinContent(nn,0.00001);
-           if (h3_AI[k]->GetBinContent(nn)<=0) h3_AI[k]->SetBinContent(nn,0.00001);
-
-           if (h2_OS[k]->GetBinContent(nn)<=0) h2_OS[k]->SetBinContent(nn,0.00001);
-           if (h2_SS[k]->GetBinContent(nn)<=0) h2_SS[k]->SetBinContent(nn,0.00001);
-           if (h2_QCD[k]->GetBinContent(nn)<=0) h2_QCD[k]->SetBinContent(nn,0.00001);
-           if (h2_WOS[k]->GetBinContent(nn)<=0) h2_WOS[k]->SetBinContent(nn,0.00001);
-           if (h2_WSS[k]->GetBinContent(nn)<=0) h2_WSS[k]->SetBinContent(nn,0.00001);
-           if (h3_OS[k]->GetBinContent(nn)<=0) h3_OS[k]->SetBinContent(nn,0.00001);
-           if (h3_SS[k]->GetBinContent(nn)<=0) h3_SS[k]->SetBinContent(nn,0.00001);
-           if (h3_QCD[k]->GetBinContent(nn)<=0) h3_QCD[k]->SetBinContent(nn,0.00001);
-           if (h3_WOS[k]->GetBinContent(nn)<=0) h3_WOS[k]->SetBinContent(nn,0.00001);
-           if (h3_WSS[k]->GetBinContent(nn)<=0) h3_WSS[k]->SetBinContent(nn,0.00001);
-
-           if (h4_AI[k]->GetBinContent(nn)<=0) h4_AI[k]->SetBinContent(nn,0.00001);
-           if (h4_OS[k]->GetBinContent(nn)<=0) h4_OS[k]->SetBinContent(nn,0.00001);
-           if (h4_SS[k]->GetBinContent(nn)<=0) h4_SS[k]->SetBinContent(nn,0.00001);
-           if (h4_QCD[k]->GetBinContent(nn)<=0) h4_QCD[k]->SetBinContent(nn,0.00001);
-           if (h4_WOS[k]->GetBinContent(nn)<=0) h4_WOS[k]->SetBinContent(nn,0.00001);
-           if (h4_WSS[k]->GetBinContent(nn)<=0) h4_WSS[k]->SetBinContent(nn,0.00001);
-           if (h5_AI[k]->GetBinContent(nn)<=0) h5_AI[k]->SetBinContent(nn,0.00001);
-           if (h5_OS[k]->GetBinContent(nn)<=0) h5_OS[k]->SetBinContent(nn,0.00001);
-           if (h5_SS[k]->GetBinContent(nn)<=0) h5_SS[k]->SetBinContent(nn,0.00001);
-           if (h5_QCD[k]->GetBinContent(nn)<=0) h5_QCD[k]->SetBinContent(nn,0.00001);
-           if (h5_WOS[k]->GetBinContent(nn)<=0) h5_WOS[k]->SetBinContent(nn,0.00001);
-           if (h5_WSS[k]->GetBinContent(nn)<=0) h5_WSS[k]->SetBinContent(nn,0.00001);
-           if (h6_AI[k]->GetBinContent(nn)<=0) h6_AI[k]->SetBinContent(nn,0.00001);
-           if (h6_OS[k]->GetBinContent(nn)<=0) h6_OS[k]->SetBinContent(nn,0.00001);
-           if (h6_SS[k]->GetBinContent(nn)<=0) h6_SS[k]->SetBinContent(nn,0.00001);
-           if (h6_QCD[k]->GetBinContent(nn)<=0) h6_QCD[k]->SetBinContent(nn,0.00001);
-           if (h6_WOS[k]->GetBinContent(nn)<=0) h6_WOS[k]->SetBinContent(nn,0.00001);
-           if (h6_WSS[k]->GetBinContent(nn)<=0) h6_WSS[k]->SetBinContent(nn,0.00001);
+           if (h0_OS[k]->GetBinContent(nn)<0) h0_OS[k]->SetBinContent(nn,0.00001);
+           if (h0_SS[k]->GetBinContent(nn)<0) h0_SS[k]->SetBinContent(nn,0.00001);
+           if (h0_QCD[k]->GetBinContent(nn)<0) h0_QCD[k]->SetBinContent(nn,0.00001);
+           if (h0_WOS[k]->GetBinContent(nn)<0) h0_WOS[k]->SetBinContent(nn,0.00001);
+           if (h0_WSS[k]->GetBinContent(nn)<0) h0_WSS[k]->SetBinContent(nn,0.00001);
+           if (h0_AI[k]->GetBinContent(nn)<0) h0_AI[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h1_OS[k]->GetSize()-1; ++nn){
+           if (h1_OS[k]->GetBinContent(nn)<0) h1_OS[k]->SetBinContent(nn,0.00001);
+           if (h1_SS[k]->GetBinContent(nn)<0) h1_SS[k]->SetBinContent(nn,0.00001);
+           if (h1_QCD[k]->GetBinContent(nn)<0) h1_QCD[k]->SetBinContent(nn,0.00001);
+           if (h1_WOS[k]->GetBinContent(nn)<0) h1_WOS[k]->SetBinContent(nn,0.00001);
+           if (h1_WSS[k]->GetBinContent(nn)<0) h1_WSS[k]->SetBinContent(nn,0.00001);
+           if (h1_AI[k]->GetBinContent(nn)<0) h1_AI[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h2_OS[k]->GetSize()-1; ++nn){
+           if (h2_AI[k]->GetBinContent(nn)<0) h2_AI[k]->SetBinContent(nn,0.00001);
+           if (h2_OS[k]->GetBinContent(nn)<0) h2_OS[k]->SetBinContent(nn,0.00001);
+           if (h2_SS[k]->GetBinContent(nn)<0) h2_SS[k]->SetBinContent(nn,0.00001);
+           if (h2_QCD[k]->GetBinContent(nn)<0) h2_QCD[k]->SetBinContent(nn,0.00001);
+           if (h2_WOS[k]->GetBinContent(nn)<0) h2_WOS[k]->SetBinContent(nn,0.00001);
+           if (h2_WSS[k]->GetBinContent(nn)<0) h2_WSS[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h3_OS[k]->GetSize()-1; ++nn){
+           if (h3_OS[k]->GetBinContent(nn)<0) h3_OS[k]->SetBinContent(nn,0.00001);
+           if (h3_SS[k]->GetBinContent(nn)<0) h3_SS[k]->SetBinContent(nn,0.00001);
+           if (h3_QCD[k]->GetBinContent(nn)<0) h3_QCD[k]->SetBinContent(nn,0.00001);
+           if (h3_WOS[k]->GetBinContent(nn)<0) h3_WOS[k]->SetBinContent(nn,0.00001);
+           if (h3_WSS[k]->GetBinContent(nn)<0) h3_WSS[k]->SetBinContent(nn,0.00001);
+           if (h3_AI[k]->GetBinContent(nn)<0) h3_AI[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h4_OS[k]->GetSize()-1; ++nn){
+           if (h4_AI[k]->GetBinContent(nn)<0) h4_AI[k]->SetBinContent(nn,0.00001);
+           if (h4_OS[k]->GetBinContent(nn)<0) h4_OS[k]->SetBinContent(nn,0.00001);
+           if (h4_SS[k]->GetBinContent(nn)<0) h4_SS[k]->SetBinContent(nn,0.00001);
+           if (h4_QCD[k]->GetBinContent(nn)<0) h4_QCD[k]->SetBinContent(nn,0.00001);
+           if (h4_WOS[k]->GetBinContent(nn)<0) h4_WOS[k]->SetBinContent(nn,0.00001);
+           if (h4_WSS[k]->GetBinContent(nn)<0) h4_WSS[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h5_OS[k]->GetSize()-1; ++nn){
+           if (h5_AI[k]->GetBinContent(nn)<0) h5_AI[k]->SetBinContent(nn,0.00001);
+           if (h5_OS[k]->GetBinContent(nn)<0) h5_OS[k]->SetBinContent(nn,0.00001);
+           if (h5_SS[k]->GetBinContent(nn)<0) h5_SS[k]->SetBinContent(nn,0.00001);
+           if (h5_QCD[k]->GetBinContent(nn)<0) h5_QCD[k]->SetBinContent(nn,0.00001);
+           if (h5_WOS[k]->GetBinContent(nn)<0) h5_WOS[k]->SetBinContent(nn,0.00001);
+           if (h5_WSS[k]->GetBinContent(nn)<0) h5_WSS[k]->SetBinContent(nn,0.00001);
+       }
+       for (int nn=1; nn<h6_OS[k]->GetSize()-1; ++nn){
+           if (h6_AI[k]->GetBinContent(nn)<0) h6_AI[k]->SetBinContent(nn,0.00001);
+           if (h6_OS[k]->GetBinContent(nn)<0) h6_OS[k]->SetBinContent(nn,0.00001);
+           if (h6_SS[k]->GetBinContent(nn)<0) h6_SS[k]->SetBinContent(nn,0.00001);
+           if (h6_QCD[k]->GetBinContent(nn)<0) h6_QCD[k]->SetBinContent(nn,0.00001);
+           if (h6_WOS[k]->GetBinContent(nn)<0) h6_WOS[k]->SetBinContent(nn,0.00001);
+           if (h6_WSS[k]->GetBinContent(nn)<0) h6_WSS[k]->SetBinContent(nn,0.00001);
        }
 
        OS0jet->cd();
